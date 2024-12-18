@@ -1,0 +1,22 @@
+[
+	{
+	  "game": "Fortnite",
+	  "description": "Be the last player standing in Battle Royale and Zero Build, explore and survive in LEGO Fortnite, blast to the finish with Rocket Racing or headline a concert with Fortnite Festival.",
+	  "id": "1",
+      "currentPrice": 60,
+      "sellerName": "Epic Games store",
+      "developerName": "Epic Games devel",
+      "publisherName": "Epic Games publish",
+      "thumbnailURL": "https://www.fortnite.com/download?lang=en-US"
+    },
+	{
+        "game": "Fallguys",
+        "description": "Fall Guys Creative is a level editor that allows you to create fiendish custom Rounds and share them with the wider community. The Blunderdome Construction Crew invites you to discover new ways to play Fall Guys with Fall Guys Creative!",
+        "id": "2",
+        "currentPrice": 55,
+        "sellerName": "Epic Games store",
+        "developerName": "Epic Games devel",
+        "publisherName": "Epic Games publish",
+        "thumbnailURL": "https://www.fallguys.com/en-US/download"
+      }
+]
