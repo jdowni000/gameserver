@@ -29,67 +29,87 @@ type RootGameInfo []struct {
 }
 
 func main() {
-	http.HandleFunc("/", getRoot)
-	http.HandleFunc("/game", getGame)
+	http.HandleFunc("/", GetRoot)
+	http.HandleFunc("/game", GetGame)
 
 	err := http.ListenAndServe(":8080", nil)
 	fmt.Print(err)
 }
 
+func Writer(w http.ResponseWriter, data string) error {
+	_, error := io.WriteString(w, data)
+	return error
+}
+
 // Gets basic information regarding all games
-func getRoot(w http.ResponseWriter, r *http.Request) {
-	games := jsonRootGameInfo("games.json")
+func GetRoot(w http.ResponseWriter, r *http.Request) {
+	games, err := JsonRootGameInfo("games.json")
+	if err != nil {
+		log.Fatalln(err)
+	}
 	fmt.Printf("got / request\n")
 
 	for i := 0; i < len(games); i++ {
 		game := fmt.Sprint("Game: " + games[i].Game + "\n")
 		description := fmt.Sprint("Description: " + games[i].Description + "\n")
 		id := fmt.Sprint("ID: " + games[i].ID + "\n")
-		io.WriteString(w, game)
-		io.WriteString(w, description)
-		io.WriteString(w, id)
-
+		err := Writer(w, game)
+		if err != nil {
+			log.Println(err)
+		}
+		err = Writer(w, description)
+		if err != nil {
+			log.Println(err)
+		}
+		err = Writer(w, id)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 }
 
 // Gets all information from URL search
-func getGame(w http.ResponseWriter, r *http.Request) {
+func GetGame(w http.ResponseWriter, r *http.Request) {
 	resp := strings.Split(r.URL.RawQuery, "{")
 	respSplit := strings.Split(resp[1], "}")
 	id := respSplit[0]
 
-	games := jsonGameInfo("games.json")
+	games, err := JsonGameInfo("games.json")
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	for _, g := range games {
 		// Get specific information matching ID of game
 		if g.ID == id {
 
-			game := fmt.Sprint("Game: " + g.Game + "\n")
-			description := fmt.Sprint("Description: " + g.Description + "\n")
-			id := fmt.Sprint("ID: " + g.ID + "\n")
-			currentPrice := fmt.Sprint("CurrentPrice: " + strconv.Itoa(g.CurrentPrice) + "\n")
-			sellerName := fmt.Sprint("SellerName: " + g.SellerName + "\n")
-			developerName := fmt.Sprint("DeveloperName: " + g.DeveloperName + "\n")
-			publisherName := fmt.Sprint("PublisherName: " + g.PublisherName + "\n")
-			thumbnailURL := fmt.Sprint("ThumbnailURL: " + g.ThumbnailURL + "\n")
+			var gameInfo []string
 
-			io.WriteString(w, game)
-			io.WriteString(w, description)
-			io.WriteString(w, id)
-			io.WriteString(w, currentPrice)
-			io.WriteString(w, sellerName)
-			io.WriteString(w, developerName)
-			io.WriteString(w, publisherName)
-			io.WriteString(w, thumbnailURL)
+			gameInfo = append(gameInfo, fmt.Sprint("Game: "+g.Game+"\n"))
+			gameInfo = append(gameInfo, fmt.Sprint("Description: "+g.Description+"\n"))
+			gameInfo = append(gameInfo, fmt.Sprint("ID: "+g.ID+"\n"))
+			gameInfo = append(gameInfo, fmt.Sprint("CurrentPrice: "+strconv.Itoa(g.CurrentPrice)+"\n"))
+			gameInfo = append(gameInfo, fmt.Sprint("SellerName: "+g.SellerName+"\n"))
+			gameInfo = append(gameInfo, fmt.Sprint("DeveloperName: "+g.DeveloperName+"\n"))
+			gameInfo = append(gameInfo, fmt.Sprint("PublisherName: "+g.PublisherName+"\n"))
+			gameInfo = append(gameInfo, fmt.Sprint("ThumbnailURL: "+g.ThumbnailURL+"\n"))
+
+			for _, v := range gameInfo {
+				err := Writer(w, v)
+				if err != nil {
+					log.Println(err)
+				}
+			}
 		}
 	}
 }
 
 // Retrieve json information and Unmarshal into RootGameInfo struct
-func jsonRootGameInfo(file string) RootGameInfo {
+func JsonRootGameInfo(file string) (RootGameInfo, error) {
 	b, err := os.Open(file)
 	if err != nil {
-		log.Fatalf("Failed to open file: %v\n", err)
+		log.Printf("Failed to open file: %v\n", err)
+		return RootGameInfo{}, err
 	}
 
 	byteValue, _ := io.ReadAll(b)
@@ -98,14 +118,15 @@ func jsonRootGameInfo(file string) RootGameInfo {
 
 	json.Unmarshal(byteValue, &games)
 
-	return games
+	return games, nil
 }
 
 // Retrieve json information and Unmarshal into GameInfo struct
-func jsonGameInfo(file string) GameInfo {
+func JsonGameInfo(file string) (GameInfo, error) {
 	b, err := os.Open(file)
 	if err != nil {
-		log.Fatalf("Failed to open file: %v\n", err)
+		log.Printf("Failed to open file: %v\n", err)
+		return GameInfo{}, err
 	}
 
 	byteValue, _ := io.ReadAll(b)
@@ -114,5 +135,5 @@ func jsonGameInfo(file string) GameInfo {
 
 	json.Unmarshal(byteValue, &games)
 
-	return games
+	return games, nil
 }
