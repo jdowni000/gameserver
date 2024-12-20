@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: jdowni000-deployment
+  name: jdowni000-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: jdowni000-deployment
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: jdowni000-deployment
+    spec:
+      containers:
+      - image: jdowni000/web-service:v1.0.0
+        name: web-service
+        ports:
+        - containerPort: 8080
+        resources: {}
+status: {}
